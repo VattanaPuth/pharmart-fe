@@ -1,0 +1,74 @@
+[
+  {
+    "title": "Verified Pharmacies",
+    "key": "verifiedPharmacies",
+    "icon": "ShieldCheck",
+    "bgColor": "bg-green-50",
+    "iconColor": "text-green-600",
+    "type": "number",
+    "value": 3
+  },
+  {
+    "title": "Pending Reviews",
+    "key": "pendingReviews",
+    "icon": "Clock",
+    "bgColor": "bg-orange-50",
+    "iconColor": "text-orange-500",
+    "type": "number",
+    "value": 1
+  },
+  {
+    "title": "Suspended",
+    "key": "suspendedPharmacies",
+    "icon": "AlertTriangle",
+    "bgColor": "bg-gray-100",
+    "iconColor": "text-gray-500",
+    "type": "number",
+    "value": 0
+  },
+  {
+    "title": "Total Customers",
+    "key": "totalCustomers",
+    "icon": "Users2",
+    "bgColor": "bg-blue-50",
+    "iconColor": "text-blue-500",
+    "type": "number",
+    "value": 1
+  },
+  {
+    "title": "Active Products",
+    "key": "activeProducts",
+    "icon": "Package",
+    "bgColor": "bg-pink-50",
+    "iconColor": "text-pink-500",
+    "type": "number",
+    "value": 17
+  },
+  {
+    "title": "Total Orders",
+    "key": "totalOrders",
+    "icon": "ClipboardList",
+    "bgColor": "bg-purple-50",
+    "iconColor": "text-purple-500",
+    "type": "number",
+    "value": 12
+  },
+  {
+    "title": "Platform Revenue",
+    "key": "platformRevenue",
+    "icon": "TrendingUp",
+    "bgColor": "bg-emerald-50",
+    "iconColor": "text-emerald-500",
+    "type": "currency",
+    "value": 169.85
+  },
+  {
+    "title": "Total Refunded",
+    "key": "totalRefunded",
+    "icon": "RefreshCw",
+    "bgColor": "bg-orange-50",
+    "iconColor": "text-orange-500",
+    "type": "currency",
+    "value": 75.96
+  }
+]

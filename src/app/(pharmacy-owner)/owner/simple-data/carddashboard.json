@@ -1,0 +1,22 @@
+[
+  {
+    "title": "Total Products",
+    "value": 6,
+    "icon": "📦"
+  },
+  {
+    "title": "Pending Orders",
+    "value": 1,
+    "icon": "⏳"
+  },
+  {
+    "title": "Total Orders",
+    "value": 7,
+    "icon": "📋"
+  },
+  {
+    "title": "All-time Revenue",
+    "value": "$117.42",
+    "icon": "📈"
+  }
+]

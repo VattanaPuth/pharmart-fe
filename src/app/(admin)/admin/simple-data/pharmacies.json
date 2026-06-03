@@ -1,0 +1,78 @@
+{
+  "pharmacies": [
+    {
+      "id": 1,
+      "name": "MediCare Pharmacy",
+      "owner": "Dr. Skibidi Toilet",
+      "status": "approved",
+      "ekyc": {
+        "match": 97,
+        "status": "match",
+        "documents": [
+          { "type": "Business License" },
+          { "type": "Pharmacist License" },
+          { "type": "Business Reg. Cert." },
+          { "type": "National ID" }
+        ]
+      },
+      "location": {
+        "city": "Phnom Penh",
+        "address": "st 310 toulkork, phnompenh",
+        "gps": {
+          "lat": 11.5564,
+          "lng": 104.9282
+        }
+      },
+      "contact": {
+        "phone": "01234567",
+        "email": "sarah@medicare-ph.com"
+      }
+    },
+    {
+      "id": 2,
+      "name": "Sunrise Health Store",
+      "owner": "Priya Patel",
+      "status": "pending",
+      "ekyc": {
+        "match": 72,
+        "status": "needs review",
+        "documents": []
+      },
+      "location": {
+        "city": "Phnom Penh",
+        "address": "456 Main Street",
+        "gps": {
+          "lat": 11.5678,
+          "lng": 104.9123
+        }
+      },
+      "contact": {
+        "phone": "09876543",
+        "email": "priya@sunrise-health.com"
+      }
+    },
+    {
+      "id": 3,
+      "name": "CareFirst Pharmacy",
+      "owner": "James Wilson",
+      "status": "rejected",
+      "ekyc": {
+        "match": 45,
+        "status": "not match",
+        "documents": []
+      },
+      "location": {
+        "city": "Phnom Penh",
+        "address": "789 Oak Avenue",
+        "gps": {
+          "lat": 11.5456,
+          "lng": 104.9345
+        }
+      },
+      "contact": {
+        "phone": "07777777",
+        "email": "james@carefirst.com"
+      }
+    }
+  ]
+}

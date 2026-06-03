@@ -1,0 +1,29 @@
+// if move to api
+
+Hook → Service → Mock Data
+mockData.json → API backend 
+
+//Example: using fetch
+
+//
+class DashboardService {
+  async getDashboard() {
+    const res = await fetch("http://localhost:8000/api/dashboard");
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch dashboard");
+    }
+
+    const data = await res.json();
+
+    return {
+      stats: data.stats,
+      pendingKYC: data.pendingKYC,
+      recentOrders: data.recentOrders,
+      reviewsOverview: data.reviewsOverview,
+    };
+  }
+}
+
+export default new DashboardService();
+//

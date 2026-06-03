@@ -1,0 +1,260 @@
+"use client";
+import React, { useState } from "react";
+import Image from "next/image";
+import {
+  Search,
+  ChevronDown,
+  Plus,
+  Pill,
+  Leaf,
+  Sparkles,
+  Baby,
+  Activity,
+  HeartPulse,
+  Check,
+  MapPin
+} from "lucide-react";
+import { ProductCard } from "@/components/BrowseProductPage/ProductCard";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+// --- Mock Data ---
+const CATEGORIES = [
+  { id: "all", label: "All", icon: null },
+  { id: "medicines", label: "Medicines", icon: <Pill size={14} /> },
+  { id: "vitamins", label: "Vitamins & Supplements", icon: <Leaf size={14} /> },
+  { id: "personal-care", label: "Personal Care", icon: <Sparkles size={14} /> },
+  { id: "baby", label: "Baby & Mother Care", icon: <Baby size={14} /> },
+  { id: "devices", label: "Medical Devices", icon: <Activity size={14} /> },
+  {
+    id: "wellness",
+    label: "Health & Wellness",
+    icon: <HeartPulse size={14} />,
+  },
+];
+
+const PRODUCTS = [
+  {
+    id: 1,
+    name: "Amoxicillin Capsules",
+    spec: "500mg • Capsule",
+    pharmacy: "MediCare Pharmacy",
+    price: 12.5,
+    unit: "Box",
+    image: "/static-data/amoxilince-capsule.jpg",
+    category: "medicines",
+  },
+  {
+    id: 2,
+    name: "Cold & Flu Relief Syrup",
+    spec: "15mg/100mg per 10ml • Syrup",
+    pharmacy: "HealthPlus Store",
+    price: 9.49,
+    unit: "Bottle 100ml",
+    image: "/static-data/theraflu.jpg",
+    category: "medicines",
+  },
+  {
+    id: 3,
+    name: "Hydrating Medical Moisturizer",
+    spec: "N/A • Cream",
+    pharmacy: "WellPoint Pharmacy",
+    price: 14.99,
+    unit: "Tube 50g",
+    image: "/static-data/obagi-moisture.jpg",
+    category: "personal-care",
+  },
+  {
+    id: 4,
+    name: "Ibuprofen Tablets",
+    spec: "400mg • Tablet",
+    pharmacy: "WellPoint Pharmacy",
+    price: 7.49,
+    unit: "Box",
+    image: "/static-data/ibuprofen.jpg",
+    category: "medicines",
+  },
+  {
+    id: 5,
+    name: "Digital Infrared Thermometer",
+    spec: "N/A • Device",
+    pharmacy: "WellPoint Pharmacy",
+    price: 34.99,
+    unit: "Unit",
+    image: "/static-data/eletronic-thermometer.jpg",
+    category: "devices",
+  },
+  {
+    id: 6,
+    name: "Metformin HCl",
+    spec: "850mg • Tablet",
+    pharmacy: "WellPoint Pharmacy",
+    price: 9.99,
+    unit: "Box",
+    image: "/static-data/metformin.jpg",
+    category: "medicines",
+  },
+];
+
+const BrowseProducts = () => {
+  const [activeTab, setActiveTab] = useState("all");
+  const [category, setCategory] = useState("All Categories");
+  const [sort, setSort] = useState("Name A-Z");
+
+  const categories = [
+    "All Categories",
+    "Medicines",
+    "Vitamins & Supplements",
+    "Personal Care",
+    "Baby & Mother Care",
+    "Medical Devices",
+    "Health & Wellness"
+  ];
+  const sortOptions = [
+    "Name A-Z",
+    "Name Z-A",
+    "Price: Low to High",
+    "Price: High to Low",
+  ];
+
+  return (
+    <main className="py-5 px-4 bg-[#F9FAFB]">
+      <section>
+        <div className="mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-1">
+            Browse Products
+          </h1>
+          {/* <p className="text-sm text-slate-500">
+            17 products from verified pharmacies
+          </p> */}
+        </div>
+
+        {/* --- Controls Bar --- */}
+        <div className="flex flex-col lg:flex-row gap-4 mb-8">
+          {/* Search Input */}
+          <div className="relative grow">
+            <Search
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+              size={18}
+            />
+            <input
+              type="text"
+              placeholder="Search by name or generic name..."
+              className="w-full bg-white border border-slate-200 rounded-xl py-3 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 transition-all shadow-sm"
+            />
+          </div>
+
+          <div className="flex gap-3">
+            {/* Category Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center justify-between gap-4 bg-white border border-slate-200 rounded-xl px-4 py-3 min-w-40 text-sm font-medium text-slate-700 hover:border-slate-300 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-pink-500/20">
+                  <span className="truncate">{category}</span>
+                  <ChevronDown size={16} className="text-slate-400 shrink-0" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="start"
+                className="w-56 rounded-xl p-2 shadow-xl border-slate-100"
+              >
+                {categories.map((item) => (
+                  <DropdownMenuItem
+                    key={item}
+                    onClick={() => setCategory(item)}
+                    className="flex items-center justify-between rounded-lg cursor-pointer py-2 px-3 focus:bg-pink-50 focus:text-[#F06292]"
+                  >
+                    {item}
+                    {category === item && (
+                      <Check size={14} className="text-[#F06292]" />
+                    )}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* --- SORT DROPDOWN --- */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center justify-between gap-4 bg-white border border-slate-200 rounded-xl px-4 py-3 min-w-40 text-sm font-medium text-slate-700 hover:border-slate-300 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-pink-500/20">
+                  <span className="flex gap-2 whitespace-nowrap">
+                    Sort:{" "}
+                    <span className="text-slate-500 font-normal">{sort}</span>
+                  </span>
+                  <ChevronDown size={16} className="text-slate-400 shrink-0" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="w-56 rounded-xl p-2 shadow-xl border-slate-100"
+              >
+                {sortOptions.map((option) => (
+                  <DropdownMenuItem
+                    key={option}
+                    onClick={() => setSort(option)}
+                    className="flex items-center justify-between rounded-lg cursor-pointer py-2 px-3 focus:bg-pink-50 focus:text-[#F06292]"
+                  >
+                    {option}
+                    {sort === option && (
+                      <Check size={14} className="text-[#F06292]" />
+                    )}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+                        <button className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-all shadow-sm">
+              <MapPin size={16} className="text-pink-500" />
+              <span>Nearby</span>
+            </button>
+          </div>
+
+
+        </div>
+
+        {/* --- Category Pill Navigation --- */}
+        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-8 mb-4">
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => setActiveTab(cat.id)}
+              className={`
+                flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-all border
+                ${
+                  activeTab === cat.id
+                    ? "bg-[#F06292] border-[#F06292] text-white shadow-md shadow-pink-100"
+                    : "bg-white border-slate-200 text-slate-600 hover:border-pink-200 hover:text-[#F06292] shadow-sm"
+                }
+              `}
+            >
+              {cat.icon && (
+                <span
+                  className={
+                    activeTab === cat.id ? "text-white" : "text-slate-400"
+                  }
+                >
+                  {cat.icon}
+                </span>
+              )}
+              {cat.label}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* --- Product Grid --- */}
+      <section>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 sm:gap-6">
+          {PRODUCTS.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      </section>
+    </main>
+  );
+};
+
+export default BrowseProducts;

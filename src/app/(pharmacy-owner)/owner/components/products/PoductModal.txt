@@ -1,0 +1,558 @@
+"use client";
+import { useState, useEffect, useRef } from "react";
+import { XCircle, Package, Trash2, Upload } from "lucide-react";
+import { PackageRow } from "./PackageRow";
+import api from "@/lib/axios";
+const FORM_OPTIONS = [
+  "Tablet",
+  "Capsule",
+  "Syrup",
+  "Injection",
+  "Cream",
+  "Drops",
+  "Inhaler",
+  "Patch",
+  "Suppository",
+  "Powder",
+];
+const STORAGE_TEMPS = [
+  {
+    key: "room",
+    label: "Room Temp",
+    sub: "below 25°C",
+    icon: "🌡️",
+    color: "#f97316",
+  },
+  {
+    key: "refrigerate",
+    label: "Refrigerate",
+    sub: "2°C – 8°C",
+    icon: "❄️",
+    color: "#38bdf8",
+  },
+  {
+    key: "freeze",
+    label: "Freeze",
+    sub: "below -18°C",
+    icon: "🧊",
+    color: "#818cf8",
+  },
+];
+
+const emptyPackage = () => ({
+  id: Date.now() + Math.random(),
+  name: "Box",
+  contains: "",
+  price: 0,
+  stock: 0,
+  lowStockAlert: 10,
+});
+
+const emptyForm = () => ({
+  name: "",
+  genericName: "",
+  strength: "",
+  form: "",
+  expiry: "",
+  category_id: "",
+  subcategory_id: "",
+  image: null,
+  imagePreview: "",
+  description: "",
+  packages: [emptyPackage()],
+  storageTemp: "room",
+});
+
+// ---- Icons ----
+const XIcon = () => <XCircle />;
+const PackageIcon = () => <Package />;
+const TrashIcon = () => <Trash2 />;
+const UploadIcon = () => <Upload />;
+
+// ---- Field Components ----
+const Field = ({ label, required, children, className = "" }) => (
+  <div className={`flex flex-col gap-1.5 ${className}`}>
+    <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+      {label}
+      {required && <span className="text-rose-400 ml-0.5">*</span>}
+    </label>
+    {children}
+  </div>
+);
+
+const Input = ({ className = "", ...props }) => (
+  <input
+    className={`w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-pink-400 transition-all ${className}`}
+    {...props}
+  />
+);
+
+const Select = ({ options, placeholder, className = "", ...props }) => (
+  <select
+    className={`w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-pink-400 transition-all bg-white appearance-none ${className}`}
+    {...props}
+  >
+    <option value="">{placeholder}</option>
+    {options.map((o) => (
+      <option key={o} value={o}>
+        {o}
+      </option>
+    ))}
+  </select>
+);
+
+// ---- Package Row ----
+
+// ---- Main Modal ----
+export default function ProductModal({
+  isOpen,
+  mode = "add",
+  product = null,
+  onClose,
+  onSave,
+  categories = [],
+}) {
+  const [form, setForm] = useState(emptyForm());
+  const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    if (isOpen && mode === "edit" && product) {
+      setForm({
+        name: product.name || "",
+        genericName: product.generic_name || "",
+        strength: product.strength || "",
+        form: product.form || "",
+        expiry: product.expiry_date?.split("T")[0] || "",
+
+        category_id: product.category_id || "",
+        categories_name : product.category_name || "",
+        subcategory_id: product.subcategory_id || "",
+
+        imagePreview: product.main_image || "",
+        image: null,
+
+        description: product.description || "",
+
+        packages: product.packages?.length
+          ? product.packages.map((p) => ({
+              id: p.id,
+              name: p.name,
+              contains: p.contains,
+              price: p.price,
+              stock: p.stock,
+              lowStockAlert: p.lowStockAlert ?? 10, // ✅ FIX HERE
+              is_default: p.is_default ?? false, // optional but useful
+            }))
+          : [emptyPackage()],
+      });
+    }
+
+  }, [isOpen, mode, product]);
+
+  
+
+  if (!isOpen) return null;
+
+  const set = (key, val) => setForm((f) => ({ ...f, [key]: val }));
+
+  const handleImageDrop = (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer?.files?.[0] || e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setForm((f) => ({ ...f, image: file, imagePreview: url }));
+  };
+
+  const addPackage = () =>
+    setForm((f) => ({ ...f, packages: [...f.packages, emptyPackage()] }));
+
+  const updatePackage = (idx, key, val) =>
+    setForm((f) => ({
+      ...f,
+      packages: f.packages.map((p, i) =>
+        i === idx ? { ...p, [key]: val } : p,
+      ),
+    }));
+
+  const removePackage = (idx) =>
+    setForm((f) => ({
+      ...f,
+      packages: f.packages.filter((_, i) => i !== idx),
+    }));
+
+
+  const handleSave = async () => {
+    try {
+      const formData = new FormData();
+
+      formData.append("product_name", form.name);
+
+      formData.append("generic_name", form.genericName);
+
+      formData.append("strength", form.strength);
+
+      formData.append("form", form.form);
+
+      formData.append("expiry_date", form.expiry);
+
+      formData.append("category_id", form.category_id);
+
+      // nullable subcategory
+      if (form.subcategory_id) {
+        formData.append("subcategory_id", form.subcategory_id);
+      }
+
+      formData.append("description", form.description);
+
+      if (form.image) {
+        formData.append("main_image", form.image);
+      }
+
+      form.packages.forEach((pkg, i) => {
+        formData.append(`packages[${i}][package_name]`, pkg.name);
+        formData.append(`packages[${i}][contains]`, pkg.contains);
+        formData.append(`packages[${i}][price]`, pkg.price);
+        formData.append(`packages[${i}][stock_quantity]`, pkg.stock);
+        formData.append(
+          `packages[${i}][low_stock_threshold]`,
+          pkg.lowStockAlert,
+        );
+        formData.append(`packages[${i}][is_default]`, pkg.is_default ? 1 : 0);
+      });
+
+      if (mode === "edit") {
+        await api.post(
+          `/owner/products/updateProduct/${product.id}?_method=PUT`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          },
+        );
+      } else {
+        await api.post("/owner/products/addProduct", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+      }
+
+      onSave?.();
+      onClose();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const storageTempInfo = STORAGE_TEMPS.find((t) => t.key === form.storageTemp);
+
+  const selectedCategory = categories.find((c) => c.id == form.category_id);
+
+  const subcategories = selectedCategory?.subcategories || [];
+
+  const setDefaultPackage = (index) => {
+    setForm((f) => ({
+      ...f,
+      packages: f.packages.map((p, i) => ({
+        ...p,
+        is_default: i === index,
+      })),
+    }));
+  };
+  return (
+    <div className="fixed inset-0 z-50 flex items-start justify-end">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      {/* Drawer Panel */}
+      <div className="relative h-full w-full max-w-lg bg-white shadow-2xl flex flex-col overflow-hidden animate-slide-in">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 shrink-0">
+          <div>
+            <h2 className="text-lg font-bold text-slate-900">
+              {mode === "edit" ? "Edit Product" : "Add Product"}
+            </h2>
+            <p className="text-xs text-slate-400 mt-0.5">
+              {mode === "edit"
+                ? `Editing: ${product?.name}`
+                : "Fill in details to add a new product"}
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
+          >
+            <XIcon />
+          </button>
+        </div>
+
+        {/* Scrollable Body */}
+        <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
+          {/* Basic Info */}
+          <Field label="Product Name" required>
+            <Input
+              placeholder="e.g. Paracetamol Tablets"
+              value={form.name}
+              onChange={(e) => set("name", e.target.value)}
+            />
+          </Field>
+
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Generic Name">
+              <Input
+                placeholder="Generic / INN name"
+                value={form.genericName}
+                onChange={(e) => set("genericName", e.target.value)}
+              />
+            </Field>
+            <Field label="Strength">
+              <Input
+                placeholder="e.g. 500mg, 1000 IU"
+                value={form.strength}
+                onChange={(e) => set("strength", e.target.value)}
+              />
+            </Field>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Form" required>
+              <div className="relative">
+                <Select
+                  options={FORM_OPTIONS}
+                  placeholder="Select form"
+                  value={form.form}
+                  onChange={(e) => set("form", e.target.value)}
+                />
+                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                  >
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </span>
+              </div>
+            </Field>
+            <Field label="Expiry Date" required>
+              <Input
+                type="date"
+                value={form.expiry}
+                onChange={(e) => set("expiry", e.target.value)}
+              />
+            </Field>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            {/* CATEGORY */}
+         
+<select
+  value={form.category_id}
+  onChange={(e) => {
+    set("category_id", e.target.value);
+    set("subcategory_id", "");
+  }}
+  className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-pink-300"
+>
+  {/* Placeholder */}
+  <option value="" disabled>
+    Select category
+  </option>
+
+  {categories
+    .filter((category) => category.active)
+    .map((category) => (
+      <option key={category.id} value={category.id}>
+        {category.name}
+      </option>
+    ))}
+</select>
+
+            {/* SUBCATEGORY */}
+            <Field label="Subcategory">
+              <select
+                value={form.subcategory_id}
+                onChange={(e) => set("subcategory_id", e.target.value)}
+                disabled={!form.category_id}
+                className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-pink-300 disabled:bg-slate-100"
+              >
+                <option value="">No subcategory</option>
+
+                {subcategories.map((subcategory) => (
+                  <option key={subcategory.id} value={subcategory.id}>
+                    {subcategory.name}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          </div>
+
+          {/* Image Upload */}
+          <Field label="Main Image">
+            <div
+              className="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center cursor-pointer hover:border-pink-300 hover:bg-pink-50/30 transition-all group"
+              onDrop={handleImageDrop}
+              onDragOver={(e) => e.preventDefault()}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {form.imagePreview ? (
+                <div className="flex flex-col items-center gap-2">
+                  <img
+                  
+                    src={`${process.env.NEXT_PUBLIC_STORAGE_URL}/storage/${form.imagePreview}` || "/images/placeholder.png"}
+                    alt="preview"
+                    className="w-20 h-20 object-cover rounded-xl shadow-sm"
+                  />
+                  <span className="text-xs text-slate-400">
+                    Click to change image
+                  </span>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-2 text-slate-300 group-hover:text-pink-400 transition-colors">
+                  <UploadIcon />
+                  <div className="text-sm font-medium text-slate-500">
+                    Click to upload image
+                  </div>
+                  <div className="text-xs text-slate-300">
+                    PNG, JPG, WEBP up to 10MB
+                  </div>
+                </div>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageDrop}
+              />
+            </div>
+          </Field>
+
+          {/* Description */}
+          <Field label="Description" required>
+            <textarea
+              placeholder="Product description..."
+              value={form.description}
+              onChange={(e) => set("description", e.target.value)}
+              rows={3}
+              className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-pink-400 transition-all resize-none"
+            />
+          </Field>
+
+          {/* Packages */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                <span className="text-green-500">
+                  <PackageIcon />
+                </span>
+                Available Packages
+                <span className="text-xs font-normal text-slate-400">
+                  ({form.packages.length} package
+                  {form.packages.length !== 1 ? "s" : ""})
+                </span>
+              </div>
+              <button
+                onClick={addPackage}
+                className="flex items-center gap-1.5 text-xs font-semibold text-pink-500 hover:text-pink-600 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-lg transition-colors"
+              >
+                + Add Package
+              </button>
+            </div>
+            <div className="space-y-3">
+              {form.packages.map((pkg, idx) => (
+                <PackageRow
+                  key={pkg.id}
+                  pkg={pkg}
+                  index={idx}
+                  onChange={(key, val) => updatePackage(idx, key, val)}
+                  onRemove={() => removePackage(idx)}
+                  canRemove={form.packages.length > 1}
+                  onSetDefault={setDefaultPackage}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Storage & Handling */}
+          <div>
+            <div className="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-3">
+              <span>🌡️</span> Storage &amp; Handling
+              <span className="text-xs font-normal text-slate-400">
+                — shown on product page
+              </span>
+            </div>
+            <Field label="Storage Temperature" required>
+              <div className="grid grid-cols-3 gap-2">
+                {STORAGE_TEMPS.map((t) => (
+                  <button
+                    key={t.key}
+                    onClick={() => set("storageTemp", t.key)}
+                    className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all text-center ${
+                      form.storageTemp === t.key
+                        ? "border-pink-400 bg-pink-50/60"
+                        : "border-slate-200 bg-white hover:border-slate-300"
+                    }`}
+                  >
+                    <span className="text-lg">{t.icon}</span>
+                    <div className="text-xs font-semibold text-slate-700 leading-tight">
+                      {t.label}
+                    </div>
+                    <div className="text-[10px] text-slate-400 leading-tight">
+                      {t.sub}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </Field>
+
+            {/* Preview */}
+            {storageTempInfo && (
+              <div className="mt-3 rounded-xl bg-amber-50 border border-amber-100 px-4 py-3">
+                <div className="text-[10px] font-semibold text-amber-600 uppercase tracking-wide mb-1.5">
+                  Preview — shown on product page:
+                </div>
+                <div className="flex items-center gap-2 text-sm text-amber-700 font-medium">
+                  <span>{storageTempInfo.icon}</span>
+                  {storageTempInfo.label} ({storageTempInfo.sub})
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Footer Actions */}
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-100 shrink-0 bg-white">
+          <button
+            onClick={onClose}
+            className="px-5 py-2.5 text-sm font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSave}
+            className="flex items-center gap-2 bg-linear-to-r from-pink-500 to-rose-400 text-white text-sm font-semibold px-6 py-2.5 rounded-full shadow-sm hover:shadow-md hover:from-pink-600 hover:to-rose-500 transition-all duration-200"
+          >
+            {mode === "edit" ? "Save Changes" : "Add Product"}
+          </button>
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes slide-in {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        .animate-slide-in {
+          animation: slide-in 0.25s cubic-bezier(0.32, 0.72, 0, 1) both;
+        }
+      `}</style>
+    </div>
+  );
+}

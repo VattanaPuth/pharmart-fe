@@ -1,0 +1,68 @@
+{
+  "verifiedPharmacies": 120,
+  "pendingReviews": 5,
+  "suspendedPharmacies": 2,
+  "totalCustomers": 540,
+  "activeProducts": 320,
+  "totalOrders": 1240,
+  "platformRevenue": 12450.75,
+  "averageOrderValue": 32.40,
+  "totalRefunded": 320.50,
+
+  "stats": {
+    "netRevenue": 0,
+    "averageRevenuePerOrder": 0,
+    "pendingKYCCount": 0,
+    "recentOrdersCount": 0
+  },
+
+"pendingKYC": [
+  {
+    "id": 1,
+    "name": "Sunrise Health Store",
+    "owner": "Priya Patel",
+    "progress": 72,
+    "image": "/images/pharmacy1.jpg"
+  },
+  {
+    "id": 2,
+    "name": "Wellness Pharmacy",
+    "owner": "John Doe",
+    "progress": 40,
+    "image": "/images/pharmacy2.jpg"
+  }
+],
+
+  "recentOrders": [
+    {
+      "id": "ORD-2026-021",
+      "pharmacy": "MediCare Pharmacy",
+      "amount": 37.98,
+      "status": "Cancel Requested"
+    },
+    {
+      "id": "ORD-2026-016",
+      "pharmacy": "MediCare Pharmacy",
+      "amount": 20.97,
+      "status": "Delivering"
+    },
+    {
+      "id": "ORD-2026-030",
+      "pharmacy": "Sunrise Health Store",
+      "amount": 45.50,
+      "status": "Delivered"
+    }
+  ],
+
+  "reviewsOverview": {
+    "rating": 4.4,
+    "totalReviews": 10,
+    "distribution": {
+      "5": 5,
+      "4": 4,
+      "3": 1,
+      "2": 0,
+      "1": 0
+    }
+  }
+}

@@ -1,0 +1,81 @@
+[
+  {
+    "id": 1,
+    "name": "Medicines",
+    "status": "active",
+    "subcategories": [
+      { "id": 101, "name": "Pain Relief", "status": "active" },
+      { "id": 102, "name": "Cold & Flu", "status": "active" },
+      { "id": 103, "name": "Allergy", "status": "active" },
+      { "id": 104, "name": "Digestive & Stomach", "status": "inactive" },
+      { "id": 105, "name": "Diabetes", "status": "active" },
+      { "id": 106, "name": "Heart & Blood Pressure", "status": "active" },
+      { "id": 107, "name": "Antibiotics", "status": "active" },
+      { "id": 108, "name": "Skin Conditions", "status": "active" },
+      { "id": 109, "name": "Eye & Ear", "status": "active" },
+      { "id": 110, "name": "Respiratory", "status": "active" }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Vitamins & Supplements",
+    "status": "active",
+    "subcategories": [
+      { "id": 201, "name": "Multivitamins", "status": "active" },
+      { "id": 202, "name": "Vitamin C", "status": "active" },
+      { "id": 203, "name": "Vitamin D", "status": "active" },
+      { "id": 204, "name": "Calcium", "status": "active" },
+      { "id": 205, "name": "Omega 3", "status": "inactive" },
+      { "id": 206, "name": "Iron Supplements", "status": "active" },
+      { "id": 207, "name": "Herbal Supplements", "status": "active" }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Personal Care",
+    "status": "active",
+    "subcategories": [
+      { "id": 301, "name": "Hair Care", "status": "active" },
+      { "id": 302, "name": "Skin Care", "status": "active" },
+      { "id": 303, "name": "Oral Care", "status": "active" },
+      { "id": 304, "name": "Bath & Body", "status": "inactive" },
+      { "id": 305, "name": "Men's Grooming", "status": "active" }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Baby & Mother Care",
+    "status": "inactive",
+    "subcategories": [
+      { "id": 401, "name": "Baby Milk", "status": "active" },
+      { "id": 402, "name": "Diapers", "status": "active" },
+      { "id": 403, "name": "Baby Skincare", "status": "active" },
+      { "id": 404, "name": "Maternity Care", "status": "inactive" },
+      { "id": 405, "name": "Baby Accessories", "status": "active" }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "Medical Devices",
+    "status": "active",
+    "subcategories": [
+      { "id": 501, "name": "Blood Pressure Monitor", "status": "active" },
+      { "id": 502, "name": "Thermometer", "status": "active" },
+      { "id": 503, "name": "Glucose Meter", "status": "active" },
+      { "id": 504, "name": "Nebulizer", "status": "inactive" },
+      { "id": 505, "name": "Wheelchair", "status": "active" }
+    ]
+  },
+  {
+    "id": 6,
+    "name": "Health & Wellness",
+    "status": "active",
+    "subcategories": [
+      { "id": 601, "name": "Weight Management", "status": "active" },
+      { "id": 602, "name": "Fitness Equipment", "status": "active" },
+      { "id": 603, "name": "Sleep Support", "status": "active" },
+      { "id": 604, "name": "Mental Wellness", "status": "inactive" },
+      { "id": 605, "name": "Energy Boosters", "status": "active" }
+    ]
+  }
+]
