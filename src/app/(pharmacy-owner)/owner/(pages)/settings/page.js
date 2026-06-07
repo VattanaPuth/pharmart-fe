@@ -7,6 +7,7 @@ import { Store, Clock3, MapPin, ImagePlus, Save, ImageOff } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import api from "@/lib/axios";
+import { getStorageUrl } from "@/lib/media";
 import { InputField } from "../../components/setting/InputField";
 import { NotificationSetting } from "../../components/setting/NotificationSetting";
 import { BusinessHourGroup } from "../../components/setting/BussinessHourGroupSetting";
@@ -20,16 +21,6 @@ const DAYS = [
   "saturday",
   "sunday",
 ];
-
-const getLogoUrl = (logo) => {
-  if (!logo) return null;
-
-  const isExternal = logo.startsWith("http");
-
-  if (isExternal) return logo;
-
-  return `${process.env.NEXT_PUBLIC_STORAGE_URL}/storage/${logo}`;
-};
 
 const isValidGoogleMapUrl = (url) => {
   if (!url) return true;
@@ -426,7 +417,7 @@ const normalized = DAYS.map((day) => {
               <div className="flex items-center gap-4">
                 {setting.logo ? (
                   <img
-                    src={getLogoUrl(setting.logo)}
+                    src={getStorageUrl(setting.logo)}
                     alt="Store Logo"
                     className="h-16 w-16 rounded-2xl object-cover border"
                   />

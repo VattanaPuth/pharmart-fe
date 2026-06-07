@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import api from "@/lib/axios";
+import { getStorageUrl } from "@/lib/media";
 import toast from "react-hot-toast";
 
 export default function ReviewsPage() {
@@ -160,9 +161,10 @@ export default function ReviewsPage() {
                         "
                       >
                         <Image
-                        src={item.image
-                        ? `${process.env.NEXT_PUBLIC_STORAGE_URL}/storage/${item.image}`
-                        : "/images/placeholder.png"}
+                          src={getStorageUrl(
+                            item.image,
+                            "/placeholder.png",
+                          )}
                           alt={item.name}
                           width={40}
                           height={40}

@@ -9,6 +9,7 @@ import {
 } from "react-icons/fi";
 
 import api from "@/lib/axios";
+import { getStorageUrl } from "@/lib/media";
 
 import DeleteModal from "../../components/products/Deletemodal";
 import ProductModal from "../../components/products/ProductModal/PoductModal";
@@ -376,11 +377,10 @@ export default function ProductsPageContent() {
                           <div className="flex gap-3">
                             <div className="w-14 h-14 rounded-xl bg-slate-100 overflow-hidden shrink-0">
                               <img
-                                src={
-                                  product.main_image
-                                    ? `${process.env.NEXT_PUBLIC_STORAGE_URL}/storage/${product.main_image}`
-                                    : "/images/placeholder.png"
-                                }
+                                src={getStorageUrl(
+                                  product.main_image,
+                                  "/images/placeholder.png",
+                                )}
                                 alt={product.product_name}
                                 className="w-full h-full object-cover"
                               />
@@ -484,11 +484,10 @@ export default function ProductsPageContent() {
                             <div className="flex items-center gap-3">
                               <div className="w-11 h-11 rounded-xl bg-slate-100 overflow-hidden shrink-0">
                                 <img
-                                  src={
-                                    product.main_image
-                                      ? `${process.env.NEXT_PUBLIC_STORAGE_URL}/storage/${product.main_image}`
-                                      : "/images/placeholder.png"
-                                  }
+                                  src={getStorageUrl(
+                                    product.main_image,
+                                    "/images/placeholder.png",
+                                  )}
                                   alt={product.product_name}
                                   className="object-cover w-full h-full"
                                 />

@@ -30,7 +30,7 @@ export default function RootLayout({ children }) {
       >
         <AuthProvider>
           <CartProvider>
-          <GoogleOAuthProvider clientId="550867182044-9gkuh535go248jtahq7jt17t1bo6rf5b.apps.googleusercontent.com">
+          <GoogleOAuthProvider clientId="255894351126-k220otac27b0astrbieg2at4gnqrnn2k.apps.googleusercontent.com">
             <Toaster position="top-right" />
             <Header />
             {children}

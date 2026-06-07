@@ -18,6 +18,7 @@ import toast from "react-hot-toast";
 
 import InvoiceModal from "../../../components/products/InvoiceModal";
 import api from "@/lib/axios";
+import { getStorageUrl } from "@/lib/media";
 import Link from "next/link";
 import OrderProgress from "../../../components/orders/OrderProgressSteps";
 
@@ -285,11 +286,7 @@ export default function OrderDetail() {
                   >
                     <div className="flex gap-4">
                       <img
-                        src={
-                          item.image?.startsWith("http")
-                            ? item.image
-                            : `${process.env.NEXT_PUBLIC_STORAGE_URL}/storage/${item.image}`
-                        }
+                        src={getStorageUrl(item.image)}
                         className="h-16 w-16 rounded-xl object-cover border border-gray-100"
                         alt={item.name}
                       />

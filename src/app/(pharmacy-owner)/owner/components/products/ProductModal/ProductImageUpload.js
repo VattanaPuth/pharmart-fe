@@ -1,6 +1,7 @@
 import React from "react";
 import { Field } from "./Field";
 import { Upload } from "lucide-react";
+import { getStorageUrl } from "@/lib/media";
 
 const ProductImageUpload = ({form,handleImageDrop ,fileInputRef}) => {
 
@@ -15,11 +16,7 @@ const ProductImageUpload = ({form,handleImageDrop ,fileInputRef}) => {
       >
         {form.imagePreview ? (
           <img
-            src={
-              form.imagePreview.startsWith("blob:")
-                ? form.imagePreview
-                : `${process.env.NEXT_PUBLIC_STORAGE_URL}/storage/${form.imagePreview}`
-            }
+            src={getStorageUrl(form.imagePreview)}
             alt="preview"
             className="w-20 h-20 object-cover rounded-xl mx-auto"
           />

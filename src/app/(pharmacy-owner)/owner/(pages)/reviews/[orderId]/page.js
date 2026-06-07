@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import api from "@/lib/axios";
+import { getStorageUrl } from "@/lib/media";
 import toast from "react-hot-toast";
 import { Star, Package, User, Calendar } from "lucide-react";
 export default function OrderReviewPage() {
@@ -99,9 +100,7 @@ export default function OrderReviewPage() {
               <div className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b bg-gray-50">
                 <div className="flex items-center gap-4">
                   <Image
-                    src={item.image
-                        ? `${process.env.NEXT_PUBLIC_STORAGE_URL}/storage/${item.image}`
-                        : "/images/placeholder.png"}
+                    src={getStorageUrl(item.image, "/placeholder.png")}
                     alt={item.name}
                     width={72}
                     height={72}

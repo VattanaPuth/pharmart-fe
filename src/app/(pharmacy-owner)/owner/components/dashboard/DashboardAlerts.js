@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { getStorageUrl } from "@/lib/media";
 
 const WarningIcon = () => (
   <svg
@@ -67,8 +68,20 @@ export default function DashboardAlerts({ data, pending_orders ,low_stock_produc
             <h3 className="font-bold mb-3">Low Stock</h3>
 
             {lowStock.map((p, i) => (
-              <div key={i} className="flex justify-between py-2">
-                <div>{p.product_name}</div>
+              <div key={i} className="flex items-center justify-between py-2 gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <img
+                    src={getStorageUrl(p.main_image, "/placeholder.png")}
+                    alt={p.product_name}
+                    className="h-12 w-12 rounded-xl object-cover border border-slate-100 bg-slate-50 shrink-0"
+                  />
+                  <div className="min-w-0">
+                    <div className="font-semibold truncate">{p.product_name}</div>
+                    <div className="text-xs text-gray-400">
+                      {p.form || p.strength || "Product"}
+                    </div>
+                  </div>
+                </div>
                 <div className="text-orange-500 font-bold">
                   {p.stock_quantity}
                 </div>
@@ -81,10 +94,17 @@ export default function DashboardAlerts({ data, pending_orders ,low_stock_produc
             <h3 className="font-bold mb-3">Near Expiry</h3>
 
             {nearExpiry.map((p, i) => (
-              <div key={i} className="flex justify-between py-2">
-                <div>
-                  <div className="font-semibold">{p.product_name}</div>
+              <div key={i} className="flex items-center justify-between py-2 gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <img
+                    src={getStorageUrl(p.main_image, "/placeholder.png")}
+                    alt={p.product_name}
+                    className="h-12 w-12 rounded-xl object-cover border border-slate-100 bg-slate-50 shrink-0"
+                  />
+                  <div className="min-w-0">
+                    <div className="font-semibold truncate">{p.product_name}</div>
                   <div className="text-xs text-gray-400">{p.package_name}</div>
+                  </div>
                 </div>
 
                 <div className="text-orange-600 font-bold">

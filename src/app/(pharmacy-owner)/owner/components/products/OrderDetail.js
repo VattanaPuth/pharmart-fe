@@ -5,6 +5,7 @@ import { useState } from "react";
 import InvoiceModal from "./InvoiceModal";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { getStorageUrl } from "@/lib/media";
 
 import {
   confirmOrder,
@@ -216,12 +217,9 @@ export default function OrderDetail({ order, onBack }) {
             >
               <div className="flex gap-4">
                 <img
-                  src={
-                    item.image?.startsWith("http")
-                      ? item.image
-                      : `${process.env.NEXT_PUBLIC_STORAGE_URL}/storage/${item.image}`
-                  }
+                  src={getStorageUrl(item.image)}
                   className="h-16 w-16 rounded-lg object-cover"
+                  alt={item.display_product_name || item.name}
                 />
 
                 <div>
