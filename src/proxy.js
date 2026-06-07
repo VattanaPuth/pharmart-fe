@@ -19,7 +19,7 @@ export function proxy(request) {
 
 
 
-  // 🔓 PUBLIC ROUTES (no auth at all)
+  // PUBLIC ROUTES (no auth at all)
   const publicRoutes = [
     "/login",
     "/registration",
@@ -56,9 +56,9 @@ const onboarding =
     : true;
 
     console.log("decoded:", decoded);
-console.log("onboarding:", decoded.onboarding);
-console.log("type:", typeof decoded.onboarding);
-  // const onboarding = decoded.onboarding ?? false;
+    console.log("onboarding:", decoded.onboarding);
+    console.log("type:", typeof decoded.onboarding);
+      // const onboarding = decoded.onboarding ?? false;
   
   
 
@@ -74,17 +74,22 @@ console.log("type:", typeof decoded.onboarding);
   // 🚨 STEP 2: BLOCK UNFINISHED USERS FROM APP
   const isAppRoute =
     pathname.startsWith("/owner") ||
-    pathname.startsWith("/user") ||
-    pathname.startsWith("/admin");
+    pathname.startsWith("/customer") ||
+    pathname.startsWith("/admin") || 
+    pathname.startsWith("/user");
+      
 
   if (isAppRoute && !onboarding) {
-    return NextResponse.redirect(
-      new URL("/registration", request.url)
-    );
+    const onboardingPath =
+      role === "CUSTOMER"
+        ? "/registration/onboarding/customer"
+        : "/registration/onboarding/owner";
+
+    return NextResponse.redirect(new URL(onboardingPath, request.url));
   }
 
   //  OWNER
-if (pathname.startsWith("/owner")) {
+  if (pathname.startsWith("/owner")) {
     if (role !== "OWNER") {
       return NextResponse.redirect(new URL("/", request.url));
     }
@@ -99,7 +104,7 @@ if (pathname.startsWith("/owner")) {
   }
 
   //  CUSTOMER
-  if (pathname.startsWith("/user") && role !== "CUSTOMER") {
+  if (pathname.startsWith("/customer") && role !== "CUSTOMER") {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
@@ -114,10 +119,11 @@ if (pathname.startsWith("/owner")) {
 export const config = {
   matcher: [
     "/owner/:path*",
-    "/user/:path*",
+    "/customer/:path*",
     "/admin/:path*",
+    "/user/:path*",
     "/login",
-    "/registration",
+    "/registration/:path*",
     "/test/:path*",
   ],
 };

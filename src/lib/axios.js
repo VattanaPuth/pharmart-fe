@@ -11,7 +11,7 @@ const normalizeApiUrl = (url) => {
 
 const isProtectedPage = (pathname) =>
   pathname.startsWith("/owner") ||
-  pathname.startsWith("/user") ||
+  pathname.startsWith("/customer") ||
   pathname.startsWith("/admin");
 
 const api = axios.create({

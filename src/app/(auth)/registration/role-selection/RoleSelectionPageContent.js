@@ -4,7 +4,6 @@ import { useState } from "react";
 import React from "react";
 import { User2, Store } from "lucide-react";
 import Image from "next/image";
-import { FcGoogle } from "react-icons/fc";
 import api from "@/lib/axios";
 import { useSearchParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -15,7 +14,6 @@ const RoleSelectionPageContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const pendingToken = localStorage.getItem("pending_token");
   const idToken = searchParams.get("id_token");
   const isGoogle = searchParams.get("google") === "1";
 
@@ -41,6 +39,11 @@ const RoleSelectionPageContent = () => {
 
       // OTP FLOW
       else {
+        const pendingToken =
+          typeof window !== "undefined"
+            ? localStorage.getItem("pending_token")
+            : null;
+
         if (!pendingToken) {
           //alert("Session expired. Please start again.");
           toast.error("Session expired. Please start again.");
@@ -55,32 +58,42 @@ const RoleSelectionPageContent = () => {
         });
       }
 
-      console.log("res: ", res)
       const payload = res.data?.data ?? res.data;
       const ownerId = payload.owner?.id;
 
       //  SAVE TOKEN
       localStorage.setItem("token", payload.token);
       document.cookie = `token=${payload.token}; path=/`;
-
-      const roleLower = role.toLowerCase();
+      localStorage.removeItem("pending_token");
 
       if (!payload.user?.onboarding_completed) {
-        router.push(`/registration/onboarding/${roleLower}?owner_id=${ownerId}`);
+        if (role === "OWNER" && !ownerId) {
+          toast.error("Owner profile was not created. Please try again.");
+          return;
+        }
+
+        const onboardingPath =
+          role === "OWNER"
+            ? `/registration/onboarding/owner?owner_id=${ownerId}`
+            : "/registration/onboarding/customer";
+
+        router.push(onboardingPath);
         return;
       }
 
-      // localStorage.removeItem("pending_token");
-       // REDIRECT
-      // localStorage.removeItem("pending_token");
       if (role === "OWNER") {
+        if (!ownerId) {
+          toast.error("Owner profile was not found. Please login again.");
+          router.push("/login");
+          return;
+        }
+
         router.push(`/registration/onboarding/owner?owner_id=${ownerId}`);
       } else {
         router.push("/registration/onboarding/customer");
       }
     } catch (err) {
       
-      const status = err?.response?.status;
       const data = err?.response?.data;
       const message = data?.error || data?.message || "Something went wrong";
 
@@ -115,7 +128,7 @@ const RoleSelectionPageContent = () => {
             width={200} // Adjust width (in pixels) based on your original asset size
             height={200} // Adjust height (in pixels)
             priority // Optional: Use this to load the logo quickly
-            className="mb-2 w-50 h-50" // Optional: Add spacing
+            className="mb-2" // Optional: Add spacing
           />
         </div>
         <h1 className="text-2xl font-bold text-slate-800 mt-4">

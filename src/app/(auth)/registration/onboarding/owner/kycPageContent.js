@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import api from "@/lib/axios";
 
@@ -13,11 +13,13 @@ import { ReviewStep } from "@/components/LoginAndRegistration/ReviewStep";
 export default function PharmacyKYCContent() {
   const searchParams = useSearchParams();
   const ownerId = searchParams.get("owner_id");
+  const validOwnerId = ownerId && ownerId !== "undefined" && ownerId !== "null";
 
   const router = useRouter();
 
   const [progress, setProgress] = useState(null);
   const [loading, setLoading] = useState(true);
+  const initializedProgress = useRef(false);
 
   // ---------------- TABS ----------------
   const tabs = ["profile", "documents", "selfie", "review"];
@@ -40,7 +42,12 @@ export default function PharmacyKYCContent() {
   const [selfieFile, setSelfieFile] = useState(null);
 
   // ---------------- FETCH ----------------
-  const fetchProgress = async () => {
+  const fetchProgress = useCallback(async () => {
+    if (!validOwnerId) {
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await api.get(
         `/owners/${ownerId}/ekyc/progress`
@@ -49,7 +56,7 @@ export default function PharmacyKYCContent() {
       setProgress(res.data);
 
       // only auto set first time
-      if (!progress) {
+      if (!initializedProgress.current) {
         if (!res.data.profile_completed) {
           setActiveTab("profile");
         } else if (!res.data.documents_completed) {
@@ -59,22 +66,47 @@ export default function PharmacyKYCContent() {
         } else {
           setActiveTab("review");
         }
+
+        initializedProgress.current = true;
       }
     } catch (err) {
       console.log("Failed to load progress");
     } finally {
       setLoading(false);
     }
-  };
+  }, [ownerId, validOwnerId]);
 
   useEffect(() => {
-    if (ownerId) {
-      fetchProgress();
-    }
-  }, [ownerId]);
+    const recoverOwnerId = async () => {
+      if (validOwnerId) {
+        fetchProgress();
+        return;
+      }
+
+      try {
+        const res = await api.get("/get_user_info");
+        const recoveredOwnerId = res.data?.owner?.id;
+
+        if (recoveredOwnerId) {
+          router.replace(`/registration/onboarding/owner?owner_id=${recoveredOwnerId}`);
+          return;
+        }
+      } catch {
+        // fall through to login
+      }
+
+      router.replace("/login");
+    };
+
+    recoverOwnerId();
+  }, [fetchProgress, router, validOwnerId]);
 
   // ---------------- FINAL SUBMIT ----------------
   const handleSubmit = async () => {
+    if (!validOwnerId) {
+      return;
+    }
+
     try {
       const res = await api.post(
         `/owners/${ownerId}/ekyc/step4`
