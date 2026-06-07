@@ -1,18 +1,18 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { User, Phone, ArrowLeft } from "lucide-react";
+import { Phone, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button"; // Assuming shadcn
 import { Input } from "@/components/ui/input"; // Assuming shadcn
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import api from "@/lib/axios";
 import toast from "react-hot-toast";
 
-export default function PhoneLoginOTP() {
-  const router = useRouter();
+const getErrorMessage = (err, fallback) =>
+  err.response?.data?.error || err.response?.data?.message || fallback;
 
+export default function PhoneLoginOTP() {
   const [pendingToken, setPendingToken] = useState(null);
   const [otp, setOtp] = useState(new Array(6).fill(""));
 
@@ -43,6 +43,9 @@ export default function PhoneLoginOTP() {
 
   const handleSendOtp = async () => {
     try {
+      setPendingToken(null);
+      setOtp(new Array(6).fill(""));
+
       const res = await api.post("/auth/login/otp/send", {
         phone: `+855${phone.replace(/\D/g, "")}`,
       });
@@ -52,9 +55,9 @@ export default function PhoneLoginOTP() {
       //alert("OTP sent!");
       toast.success("OTP sent!")
     } catch (err) {
-      console.error(err.response?.data || err.message);
+      setPendingToken(null);
       //alert(err.response?.data?.error || "Failed to send OTP");
-      toast.error("Failed to send OTP")
+      toast.error(getErrorMessage(err, "Failed to send OTP"))
     }
   };
 
@@ -82,31 +85,38 @@ export default function PhoneLoginOTP() {
       document.cookie = `token=${data.token}; path=/`;
 
       const role = data.user?.role;
+      localStorage.setItem("role", role || "");
 
       // ROLE BASED REDIRECT
+      let nextPath = "/";
+
       switch (role) {
         case "OWNER":
-          router.push("/owner/dashboard");
+          nextPath = "/owner/dashboard";
           break;
 
         case "CUSTOMER":
-          router.push("/user/account");
+          nextPath = "/user/account";
           break;
 
         case "ADMIN":
-          router.push("/admin/dashboard");
+          nextPath = "/admin/dashboard";
           break;
 
         default:
-          router.push("/");
+          nextPath = data.requires_role_selection
+            ? "/registration/role-selection"
+            : "/";
           break;
       }
 
-      router.refresh();
+      window.location.href = nextPath;
     } catch (err) {
-      console.error(err.response?.data || err.message);
+      if (getErrorMessage(err, "").includes("Session expired")) {
+        setPendingToken(null);
+      }
       //alert(err.response?.data?.error || "Invalid OTP");
-      toast.error("Invalid OTP")
+      toast.error(getErrorMessage(err, "Invalid OTP"))
     }
   };
 
@@ -126,15 +136,15 @@ export default function PhoneLoginOTP() {
         </div>
 
         <h1 className="text-2xl font-bold text-slate-800 mt-4">
-          Create Account
+          Sign in with OTP
         </h1>
-        <p className="text-slate-500 text-sm">Join Pharmart today</p>
+        <p className="text-slate-500 text-sm">Enter your phone number to continue</p>
       </div>
 
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-2xl border border-slate-100 shadow-sm">
         {/* Back Button */}
         <Link
-          href="/test/registration"
+          href="/login"
           className="flex items-center text-sm text-slate-500 hover:text-slate-800 transition-colors"
         >
           <ArrowLeft className="w-4 h-4 mr-1" /> Back
@@ -212,12 +222,12 @@ export default function PhoneLoginOTP() {
 
         {/* Footer */}
         <p className="text-center text-sm text-slate-500">
-          Already have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link
-            href={"/test/login"}
+            href={"/registration"}
             className="text-pink-400 font-medium hover:underline"
           >
-            log in
+            Create an account
           </Link>
         </p>
       </div>

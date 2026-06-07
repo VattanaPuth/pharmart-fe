@@ -56,15 +56,16 @@ const RoleSelectionPageContent = () => {
       }
 
       console.log("res: ", res)
-      const ownerId = res.data.data.owner?.id;
+      const payload = res.data?.data ?? res.data;
+      const ownerId = payload.owner?.id;
 
       //  SAVE TOKEN
-      localStorage.setItem("token", res.data.data.token);
-      document.cookie = `token=${res.data.data.token}; path=/`;
+      localStorage.setItem("token", payload.token);
+      document.cookie = `token=${payload.token}; path=/`;
 
       const roleLower = role.toLowerCase();
 
-      if (!res.data.data.user?.onboarding_completed) {
+      if (!payload.user?.onboarding_completed) {
         router.push(`/registration/onboarding/${roleLower}?owner_id=${ownerId}`);
         return;
       }
@@ -81,6 +82,14 @@ const RoleSelectionPageContent = () => {
       
       const status = err?.response?.status;
       const data = err?.response?.data;
+      const message = data?.error || data?.message || "Something went wrong";
+
+      if (message.includes("Session expired")) {
+        localStorage.removeItem("pending_token");
+        toast.error(message);
+        router.push("/registration/otp");
+        return;
+      }
 
       // HANDLE ALREADY SELECTED ROLE
       // if (status === 422 && data?.error === "Role has already been selected") {
@@ -91,7 +100,7 @@ const RoleSelectionPageContent = () => {
       // }
 
      // alert(data?.message || "Something went wrong");
-     toast.error("Something went wrong");
+     toast.error(message);
     }
   };
 
@@ -151,7 +160,7 @@ const RoleSelectionPageContent = () => {
           <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 mb-8 flex gap-3">
             <p className="text-[11px] text-blue-700 leading-relaxed">
               Pharmacy owners must complete eKYC verification before selling.
-              You'll be guided through this after registration.
+              You&apos;ll be guided through this after registration.
             </p>
           </div>
         )}

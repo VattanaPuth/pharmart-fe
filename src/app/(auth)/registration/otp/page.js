@@ -1,15 +1,17 @@
 // src/app/(auth)/registration/otp/page.js
 "use client";
 
-import React, { useState, useRef } from "react";
-import { User, Phone, ArrowLeft } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import { Phone, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button"; // Assuming shadcn
 import { Input } from "@/components/ui/input"; // Assuming shadcn
 import Image from "next/image";
 import Link from "next/link";
 import api from "@/lib/axios";
-import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+
+const getErrorMessage = (err, fallback) =>
+  err.response?.data?.error || err.response?.data?.message || fallback;
 
 export default function PhoneRegisterForm() {
   const [otp, setOtp] = useState(new Array(6).fill(""));
@@ -20,8 +22,10 @@ export default function PhoneRegisterForm() {
 
   const inputRefs = useRef([]);
   const [pendingToken, setPendingToken] = useState(null);
-  const fullPhone = `+855${phone.replace(/\D/g, "")}`;
-  const router = useRouter();
+
+  useEffect(() => {
+    localStorage.removeItem("pending_token");
+  }, []);
 
   // Handle OTP digit changes
   const handleChange = (element, index) => {
@@ -44,6 +48,10 @@ export default function PhoneRegisterForm() {
 
   const handleSendOtp = async () => {
     try {
+      localStorage.removeItem("pending_token");
+      setPendingToken(null);
+      setOtp(new Array(6).fill(""));
+
       const res = await api.post("/auth/register/otp/send", {
         phone: `+855${phone.replace(/\D/g, "")}`,
       });
@@ -53,9 +61,10 @@ export default function PhoneRegisterForm() {
       //alert("OTP sent!");
       toast.success("OTP sent !")
     } catch (err) {
-      console.error(err.response?.data || err.message);
+      localStorage.removeItem("pending_token");
+      setPendingToken(null);
       //alert(err.response?.data?.error || "Failed to send OTP");
-      toast.error("Failed to send OTP !")
+      toast.error(getErrorMessage(err, "Failed to send OTP !"))
     }
   };
 
@@ -70,11 +79,14 @@ export default function PhoneRegisterForm() {
 
       // redirect to role page
       localStorage.setItem("pending_token", pendingToken);
-      router.push("/registration/role-selection");
+      window.location.href = "/registration/role-selection";
     } catch (err) {
-      console.error(err.response?.data || err.message);
+      if (getErrorMessage(err, "").includes("Session expired")) {
+        localStorage.removeItem("pending_token");
+        setPendingToken(null);
+      }
      // alert(err.response?.data?.error || "Invalid OTP");
-     toast.error("Invalid OTP")
+     toast.error(getErrorMessage(err, "Invalid OTP"))
 
     }
   };
@@ -103,7 +115,7 @@ export default function PhoneRegisterForm() {
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-2xl border border-slate-100 shadow-sm">
         {/* Back Button */}
         <Link
-          href="/test/registration"
+          href="/registration"
           className="flex items-center text-sm text-slate-500 hover:text-slate-800 transition-colors"
         >
           <ArrowLeft className="w-4 h-4 mr-1" /> Back

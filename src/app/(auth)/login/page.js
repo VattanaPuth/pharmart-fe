@@ -135,7 +135,7 @@ const LoginPage = () => {
           </div>
 
           <Link
-            href={"/test/login/otp"}
+            href={"/login/otp"}
             className="w-full flex items-center justify-between py-3 px-4 border border-slate-200 rounded-lg font-medium text-slate-700 hover:bg-slate-50 transition-colors group"
           >
             <div className="flex items-center gap-3">
@@ -156,7 +156,7 @@ const LoginPage = () => {
 
         {/* Footer */}
         <p className="text-center mt-10 text-sm text-slate-500">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link
             href={"/registration"}
             className="text-pink-500 font-semibold hover:underline"
