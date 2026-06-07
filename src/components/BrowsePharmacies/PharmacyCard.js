@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { MapPin, Package, Navigation } from "lucide-react";
 import Link from "next/link";
+import { getStorageUrl } from "@/lib/media";
 
 const fallback = "/placeholder.png";
 export const PharmacyCard = ({ pharmacy }) => (
@@ -13,15 +14,7 @@ export const PharmacyCard = ({ pharmacy }) => (
     <div className="relative h-48 w-full overflow-hidden">
       <Image
 
-          src={
-           pharmacy.image
-              ? pharmacy.image.startsWith("http") ||
-                pharmacy.image.includes("amazon")
-                ? pharmacy.image
-                : `${process.env.NEXT_PUBLIC_STORAGE_URL}/storage${pharmacy.image}`
-                
-              : fallback
-          }
+          src={getStorageUrl(pharmacy.image, fallback)}
 
       
         alt={pharmacy.name}

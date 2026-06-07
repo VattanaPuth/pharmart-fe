@@ -74,7 +74,7 @@ console.log("type:", typeof decoded.onboarding);
   // 🚨 STEP 2: BLOCK UNFINISHED USERS FROM APP
   const isAppRoute =
     pathname.startsWith("/owner") ||
-    pathname.startsWith("/customer") ||
+    pathname.startsWith("/user") ||
     pathname.startsWith("/admin");
 
   if (isAppRoute && !onboarding) {
@@ -99,7 +99,7 @@ if (pathname.startsWith("/owner")) {
   }
 
   //  CUSTOMER
-  if (pathname.startsWith("/customer") && role !== "CUSTOMER") {
+  if (pathname.startsWith("/user") && role !== "CUSTOMER") {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
@@ -114,7 +114,7 @@ if (pathname.startsWith("/owner")) {
 export const config = {
   matcher: [
     "/owner/:path*",
-    "/customer/:path*",
+    "/user/:path*",
     "/admin/:path*",
     "/login",
     "/registration",

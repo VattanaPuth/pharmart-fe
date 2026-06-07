@@ -3,15 +3,13 @@ import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import api from "@/lib/axios";
 import { useEffect, useState } from "react";
+import { getStorageUrl } from "@/lib/media";
 
 
 const FALLBACK_IMAGE = "/no-image.png";
 
 const ProductImage = ({ product, index }) => {
-  const imageSrc =
-    typeof product?.main_image === "string" && product.main_image.trim() !== ""
-      ? product.main_image
-      : FALLBACK_IMAGE;
+  const imageSrc = getStorageUrl(product?.main_image, FALLBACK_IMAGE);
 
   return (
     <div className="aspect-square relative p-4 flex items-center justify-center bg-white">

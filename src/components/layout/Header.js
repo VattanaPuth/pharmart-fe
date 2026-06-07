@@ -8,7 +8,7 @@ import DesktopNav from "./headerComponents/DesktopNav";
 import MobileNav from "./headerComponents/MobileNav";
 import BottomBar from "./headerComponents/BottomBar";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
 import AdminNotificationButtonBell from "./headerComponents/AdminNotificationButtonBell";
@@ -27,6 +27,7 @@ const Header = () => {
   } = useAuth();
 
   const router = useRouter();
+  const pathname = usePathname();
   const role = user?.role || "unregistered";
 
   const toggleMenu = () => setIsOpen(!isOpen);
@@ -54,16 +55,20 @@ const Header = () => {
   // onboarding redirect
   // =========================
   useEffect(() => {
+    const isAuthPage =
+      pathname.startsWith("/login") || pathname.startsWith("/registration");
+
+    if (isAuthPage) return;
     if (!user) return;
 
     if (user.role === "CUSTOMER" && user.onboarding_completed === 0) {
       router.push("/registration/onboarding/customer");
     }
 
-    if (user.role === "OWNER" && user.onboarding_completed === 0) {
+    if (user.role === "OWNER" && user.onboarding_completed === 0 && owner?.id) {
       router.push(`/registration/onboarding/owner?owner_id=${owner.id}`);
     }
-  }, [user]);
+  }, [owner?.id, pathname, router, user]);
 
   return (
     <header className="sticky top-0 z-50 w-full shadow-md bg-white">

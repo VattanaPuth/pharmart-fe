@@ -28,6 +28,7 @@ import { BiRightArrow } from "react-icons/bi";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useCart } from "@/context/CartContext";
+import { getStorageUrl } from "@/lib/media";
 
 
 export default function ProductDetail() {
@@ -198,14 +199,7 @@ export default function ProductDetail() {
         <div className="bg-white rounded-[32px] flex items-center justify-center aspect-square border border-slate-100">
           <div className="relative w-full h-full">
             <Image
-              src={
-                product.image
-                  ? product.image.startsWith("http") ||
-                    product.image.includes("amazon")
-                    ? product.image
-                    : `${process.env.NEXT_PUBLIC_STORAGE_URL}/storage/${product.image}`
-                  : "/placeholder.png"
-              }
+              src={getStorageUrl(product.image)}
               alt={product.name}
               fill
               className="object-contain"

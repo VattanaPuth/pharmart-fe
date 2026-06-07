@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import api from "@/lib/axios"; // your axios instance
 import { useParams } from "next/navigation";
 import PharmacySkeleton from "@/components/StoreDetail/PharmacySkeleton";
+import { getStorageUrl } from "@/lib/media";
 import {
   ProductSkeleton,
   CategorySkeleton,
@@ -196,10 +197,11 @@ const StoreDetailPage = () => {
               <div className="flex items-center gap-5">
                 <div className="relative w-16 h-16 rounded-2xl overflow-hidden border">
                   <Image
-                    src={pharmacy.logo || "/pharm1.jpg"}
+                    src={getStorageUrl(pharmacy.logo, "/pharm1.jpg")}
                     alt={pharmacy.name}
                     fill
                     className="object-cover"
+                    unoptimized
                   />
                 </div>
 

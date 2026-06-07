@@ -3,6 +3,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import api from "@/lib/axios";
+import { getStorageUrl } from "@/lib/media";
 
 const FALLBACK_IMAGE = "/no-image.png";
 
@@ -23,8 +24,7 @@ SkeletonCard.displayName = "SkeletonCard";
 
 /* ---------------- Product Card ---------------- */
 const ProductCard = React.memo(({ product }) => {
-  const imageSrc =
-    product?.image?.trim?.() ? product.image : FALLBACK_IMAGE;
+  const imageSrc = getStorageUrl(product?.image, FALLBACK_IMAGE);
 
   return (
     <div className="min-w-50 flex-1 bg-white rounded-2xl border border-slate-100 overflow-hidden group hover:shadow-md transition-all duration-300">

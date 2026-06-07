@@ -6,6 +6,7 @@ import Link from "next/link";
 import api from "@/lib/axios";
 import toast from "react-hot-toast";
 import { useCart } from "@/context/CartContext";
+import { getStorageUrl } from "@/lib/media";
 export default function ProductCard({ product, store }) {
   const { fetchCartCount } = useCart();
   const handleAddToCart = async (e) => {
@@ -46,14 +47,7 @@ export default function ProductCard({ product, store }) {
     >
       <div className="aspect-square relative mb-4 bg-slate-50/50 rounded-xl overflow-hidden flex items-center justify-center p-6">
         <Image
-          src={
-            product.image
-              ? product.image.startsWith("http") ||
-                product.image.includes("amazon")
-                ? product.image
-                : `${process.env.NEXT_PUBLIC_STORAGE_URL}/storage/${product.image}`
-              : "/placeholder.png"
-          }
+          src={getStorageUrl(product.image)}
           alt={product.name}
           width={200}
           height={200}

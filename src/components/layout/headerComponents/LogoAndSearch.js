@@ -6,7 +6,14 @@ import { HeaderSearchBar } from "./HeaderSearchBar";
 const LogoAndSearch = ({ role }) => (
   <div className="flex items-center flex-1 gap-4">
     <Link href="/" className="shrink-0">
-      <Image src="/logo.svg" alt="Logo" width={120} height={50}  priority style={{ width: "auto", height: "auto" }}  />
+      <Image
+        src="/logo.svg"
+        alt="Logo"
+        width={120}
+        height={50}
+        priority
+        style={{ width: 120, height: "auto" }}
+      />
     </Link>
 
     {/* Desktop Search */}
@@ -23,12 +30,14 @@ const LogoAndSearch = ({ role }) => (
   </div>
 );
 
-LogoAndSearch.MobileSearch = ({ role }) => {
+const MobileSearch = ({ role }) => {
   if (["unregistered", "CUSTOMER"].includes(role)) return         <Suspense fallback={null}>
         <HeaderSearchBar />
       </Suspense>;
   if (role === "admin") return <label className="font-medium text-sm text-[#4A5565]">Admin Console</label>;
   return null;
 };
+
+LogoAndSearch.MobileSearch = MobileSearch;
 
 export default LogoAndSearch;
