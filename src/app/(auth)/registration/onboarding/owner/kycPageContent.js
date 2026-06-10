@@ -19,6 +19,7 @@ export default function PharmacyKYCContent() {
 
   const [progress, setProgress] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const initializedProgress = useRef(false);
 
   // ---------------- TABS ----------------
@@ -103,22 +104,37 @@ export default function PharmacyKYCContent() {
 
   // ---------------- FINAL SUBMIT ----------------
   const handleSubmit = async () => {
-    if (!validOwnerId) {
+    if (!validOwnerId || submitting) {
       return;
     }
 
     try {
+      setSubmitting(true);
+
       const res = await api.post(
         `/owners/${ownerId}/ekyc/step4`
       );
 
-      localStorage.setItem("token", res.data.token);
+      if (res.data?.token) {
+        localStorage.setItem("token", res.data.token);
 
-      document.cookie = `token=${res.data.token}; path=/`;
+        document.cookie = `token=${res.data.token}; path=/`;
+      }
 
+      setProgress((current) => ({
+        ...(current ?? {}),
+        profile_completed: true,
+        documents_completed: true,
+        selfie_completed: true,
+        submitted: true,
+      }));
+
+      router.refresh();
       router.replace("/owner/dashboard");
     } catch (err) {
       console.error(err);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -217,6 +233,7 @@ if (loading) {
         return (
           <ReviewStep
             onSubmit={handleSubmit}
+            loading={submitting}
             formData={{
               profile: progress?.profile_completed,
               documents: progress?.documents_completed,
